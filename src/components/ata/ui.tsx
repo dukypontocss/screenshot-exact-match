@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowDownRight, ArrowUpRight, ChevronLeft, ChevronRight, Minus, CalendarDays } from "lucide-react";
-import type { ReactNode } from "react";
+import { ArrowDownRight, ArrowUpRight, ChevronLeft, ChevronRight, Minus, CalendarDays, Moon, Sun } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { addDays, fmtDate, todayISO, type Trend } from "@/lib/ata";
@@ -10,10 +11,10 @@ export function AppHeader({ children }: { children?: ReactNode }) {
     <header className="border-b border-border bg-card">
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6">
         <Link to="/" className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-md bg-primary text-sm font-bold text-primary-foreground">A</span>
+          <img src={logo} alt="" width={32} height={32} className="h-8 w-8 object-contain" />
           <span className="text-lg font-bold tracking-tight">ATA</span>
         </Link>
-        <div className="flex min-w-0 flex-1 items-center justify-end gap-2">{children}</div>
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-2">{children}<ThemeToggle /></div>
       </div>
     </header>
   );
@@ -98,5 +99,21 @@ export function Empty({ title, children }: { title: string; children?: ReactNode
       <p className="font-medium">{title}</p>
       {children && <div className="mt-2 text-sm text-muted-foreground">{children}</div>}
     </div>
+  );
+}
+
+export function ThemeToggle() {
+  const [dark, setDark] = useState(false);
+  useEffect(() => setDark(document.documentElement.classList.contains("dark")), []);
+  const toggle = () => {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.classList.toggle("dark", next);
+    try { localStorage.setItem("ata-theme", next ? "dark" : "light"); } catch { /* ignore */ }
+  };
+  return (
+    <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={toggle} aria-label={dark ? "Modo claro" : "Modo noturno"} title={dark ? "Modo claro" : "Modo noturno"}>
+      {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+    </Button>
   );
 }
