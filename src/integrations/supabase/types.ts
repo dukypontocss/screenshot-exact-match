@@ -14,7 +14,109 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      clients: {
+        Row: {
+          archived: boolean
+          created_at: string
+          id: string
+          manager_id: string
+          name: string
+          notes: string | null
+          start_date: string | null
+        }
+        Insert: {
+          archived?: boolean
+          created_at?: string
+          id?: string
+          manager_id: string
+          name: string
+          notes?: string | null
+          start_date?: string | null
+        }
+        Update: {
+          archived?: boolean
+          created_at?: string
+          id?: string
+          manager_id?: string
+          name?: string
+          notes?: string | null
+          start_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "managers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      managers: {
+        Row: {
+          archived: boolean
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          archived?: boolean
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          archived?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      weekly_results: {
+        Row: {
+          client_id: string
+          cpl: number
+          created_at: string
+          id: string
+          leads: number
+          notes: string | null
+          period_end: string
+          period_start: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          cpl: number
+          created_at?: string
+          id?: string
+          leads: number
+          notes?: string | null
+          period_end: string
+          period_start: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          cpl?: number
+          created_at?: string
+          id?: string
+          leads?: number
+          notes?: string | null
+          period_end?: string
+          period_start?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_results_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
