@@ -5,7 +5,7 @@ import type { Result } from "./ata";
 export type Manager = { id: string; name: string; archived: boolean; created_at: string };
 export type Client = {
   id: string; manager_id: string; name: string; start_date: string | null;
-  notes: string | null; archived: boolean; created_at: string;
+  notes: string | null; archived: boolean; created_at: string; dot: string;
 };
 
 function check<T>(r: { data: T | null; error: { message: string; code?: string } | null }): T {
@@ -64,7 +64,7 @@ export function useArchiveManager() {
 export function useSaveClient() {
   const inv = useInvalidate();
   return useMutation({
-    mutationFn: async (c: { id?: string | undefined; manager_id: string; name: string; start_date: string | null; notes: string | null; archived?: boolean | undefined }) => {
+    mutationFn: async (c: { id?: string | undefined; manager_id: string; name: string; start_date: string | null; notes: string | null; dot?: string; archived?: boolean | undefined }) => {
       const { id, archived, ...base } = c;
       const rest = archived === undefined ? base : { ...base, archived };
       if (id) check(await supabase.from("clients").update(rest).eq("id", id).select());

@@ -141,7 +141,7 @@ function ClientPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             {!present && manager && <Link to="/gestor/$managerId" params={{ managerId: manager.id }} search={{ end }} className="text-sm text-muted-foreground hover:text-foreground">← {manager.name}</Link>}
-            <h1 className={cn("mt-1 font-bold tracking-tight", present ? "text-4xl sm:text-5xl" : "text-3xl")}>🔵 {client.name}</h1>
+            <h1 className={cn("mt-1 font-bold tracking-tight", present ? "text-4xl sm:text-5xl" : "text-3xl")}>{client.dot} {client.name}</h1>
             <p className="mt-1 text-muted-foreground num">
               {manager?.name} · {view === "semana" ? `${fmtDate(cur.start)} a ${fmtDate(cur.end, true)}` : fmtMonth(month)}
             </p>

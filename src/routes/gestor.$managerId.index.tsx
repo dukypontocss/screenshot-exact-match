@@ -125,7 +125,7 @@ function ManagerPage() {
                 <div key={c.id} className="flex flex-col rounded-lg border border-border bg-card p-4 shadow-[var(--shadow-card)]">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <div className="truncate font-semibold">🔵 {c.name}</div>
+                      <div className="truncate font-semibold">{c.dot} {c.name}</div>
                       {c.archived && <span className="text-xs text-muted-foreground">Arquivado</span>}
                     </div>
                     {a ? <TrendBadge trend={trend} /> : <span className="rounded-full bg-warning-soft px-2 py-0.5 text-xs font-medium text-foreground">Pendente</span>}

@@ -106,7 +106,7 @@ function BulkFill() {
               return (
                 <div key={c.id} className={cn("grid grid-cols-[1fr_6rem_8rem_6rem] items-center gap-3 border-b border-border px-4 py-2 last:border-0 sm:grid-cols-[1fr_8rem_9rem_8rem]", isDirty && "bg-accent")}>
                   <div className="min-w-0">
-                    <div className="truncate font-medium">{c.name}</div>
+                    <div className="truncate font-medium">{c.dot} {c.name}</div>
                     {L != null && C != null && <div className="num text-xs text-muted-foreground">Invest. {brl(L * C)}</div>}
                   </div>
                   <Input inputMode="numeric" aria-label={`Leads de ${c.name}`} value={r.leads} onChange={(ev) => setRows((s) => ({ ...s, [c.id]: { ...r, leads: ev.target.value } }))} />
