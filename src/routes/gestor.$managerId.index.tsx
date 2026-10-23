@@ -142,7 +142,7 @@ function ManagerPage() {
                     <Button size="icon" variant="ghost" className="ml-auto h-8 w-8" aria-label="Editar cliente" onClick={() => setClientDlg({ open: true, client: c })}><Pencil className="h-4 w-4" /></Button>
                     <Button size="icon" variant="ghost" className="h-8 w-8" aria-label={c.archived ? "Reativar" : "Arquivar"} onClick={async () => {
                       if (!c.archived && !confirm(`Arquivar ${c.name}? O histórico será mantido.`)) return;
-                      try { await saveClient.mutateAsync({ ...c, archived: !c.archived }); toast.success(c.archived ? "Cliente reativado." : "Cliente arquivado."); } catch (e) { toast.error((e as Error).message); }
+                      try { await saveClient.mutateAsync({ id: c.id, manager_id: c.manager_id, name: c.name, start_date: c.start_date, notes: c.notes, archived: !c.archived }); toast.success(c.archived ? "Cliente reativado." : "Cliente arquivado."); } catch (e) { toast.error((e as Error).message); }
                     }}>{c.archived ? <ArchiveRestore className="h-4 w-4" /> : <Archive className="h-4 w-4" />}</Button>
                   </div>
                 </div>

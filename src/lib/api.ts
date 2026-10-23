@@ -65,7 +65,8 @@ export function useSaveClient() {
   const inv = useInvalidate();
   return useMutation({
     mutationFn: async (c: { id?: string | undefined; manager_id: string; name: string; start_date: string | null; notes: string | null; archived?: boolean | undefined }) => {
-      const { id, ...rest } = c;
+      const { id, archived, ...base } = c;
+      const rest = archived === undefined ? base : { ...base, archived };
       if (id) check(await supabase.from("clients").update(rest).eq("id", id).select());
       else check(await supabase.from("clients").insert(rest).select());
     },
