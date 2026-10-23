@@ -46,7 +46,7 @@ function useInvalidate() {
 export function useSaveManager() {
   const inv = useInvalidate();
   return useMutation({
-    mutationFn: async (m: { id?: string; name: string }) => {
+    mutationFn: async (m: { id?: string | undefined; name: string }) => {
       if (m.id) check(await supabase.from("managers").update({ name: m.name }).eq("id", m.id).select());
       else check(await supabase.from("managers").insert({ name: m.name }).select());
     },
@@ -64,7 +64,7 @@ export function useArchiveManager() {
 export function useSaveClient() {
   const inv = useInvalidate();
   return useMutation({
-    mutationFn: async (c: { id?: string; manager_id: string; name: string; start_date: string | null; notes: string | null; archived?: boolean }) => {
+    mutationFn: async (c: { id?: string | undefined; manager_id: string; name: string; start_date: string | null; notes: string | null; archived?: boolean | undefined }) => {
       const { id, ...rest } = c;
       if (id) check(await supabase.from("clients").update(rest).eq("id", id).select());
       else check(await supabase.from("clients").insert(rest).select());
@@ -76,7 +76,7 @@ export function useSaveClient() {
 export function useSaveResult() {
   const inv = useInvalidate();
   return useMutation({
-    mutationFn: async (r: { id?: string; client_id: string; period_start: string; period_end: string; leads: number; cpl: number; notes: string | null }) => {
+    mutationFn: async (r: { id?: string | undefined; client_id: string; period_start: string; period_end: string; leads: number; cpl: number; notes: string | null }) => {
       const { id, ...rest } = r;
       if (id) check(await supabase.from("weekly_results").update({ ...rest, updated_at: new Date().toISOString() }).eq("id", id).select());
       else check(await supabase.from("weekly_results").insert(rest).select());

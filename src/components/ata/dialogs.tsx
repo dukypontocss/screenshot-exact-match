@@ -21,9 +21,9 @@ export function ClientDialog({
 
   const submit = async () => {
     const n = name.trim();
-    if (!n) return toast.error("Informe o nome do cliente.");
+    if (!n) return void toast.error("Informe o nome do cliente.");
     const dup = existing.find((c) => c.manager_id === managerId && c.id !== client?.id && c.name.trim().toLowerCase() === n.toLowerCase());
-    if (dup) return toast.error(`Já existe um cliente "${dup.name}" nesta carteira${dup.archived ? " (arquivado)" : ""}.`);
+    if (dup) return void toast.error(`Já existe um cliente "${dup.name}" nesta carteira${dup.archived ? " (arquivado)" : ""}.`);
     try {
       await save.mutateAsync({ id: client?.id, manager_id: managerId, name: n, start_date: start || null, notes: notes.trim() || null });
       toast.success(client ? "Cliente atualizado." : "Cliente cadastrado.");
@@ -83,10 +83,10 @@ export function ResultDialog({
 
   const submit = async () => {
     if (!client) return;
-    if (!start || !end || end < start) return toast.error("Período inválido.");
-    if (L == null || !Number.isInteger(L)) return toast.error("Leads deve ser um número inteiro.");
-    if (C == null) return toast.error("CPL inválido. Use o formato 20,25.");
-    if (isConflict) return toast.error("Já existe um registro para esse período.");
+    if (!start || !end || end < start) return void toast.error("Período inválido.");
+    if (L == null || !Number.isInteger(L)) return void toast.error("Leads deve ser um número inteiro.");
+    if (C == null) return void toast.error("CPL inválido. Use o formato 20,25.");
+    if (isConflict) return void toast.error("Já existe um registro para esse período.");
     try {
       await save.mutateAsync({ id: editing?.id, client_id: client.id, period_start: start, period_end: end, leads: L, cpl: C, notes: notes.trim() || null });
       toast.success(editing ? "Resultado atualizado." : "Resultado registrado.");

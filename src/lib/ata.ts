@@ -18,7 +18,7 @@ export function toISO(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 export function fromISO(s: string): Date {
-  const [y, m, d] = s.split("-").map(Number);
+  const [y = 1970, m = 1, d = 1] = s.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d));
 }
 export function addDays(iso: string, n: number): string {
@@ -55,7 +55,7 @@ export function monthOfPeriod(start: string, end: string): string {
   return best;
 }
 export function shiftMonth(ym: string, n: number): string {
-  const [y, m] = ym.split("-").map(Number);
+  const [y = 1970, m = 1] = ym.split("-").map(Number);
   const d = new Date(Date.UTC(y, m - 1 + n, 1));
   return toISO(d).slice(0, 7);
 }
@@ -80,7 +80,7 @@ export function fmtDate(iso: string, withYear = false) {
 }
 const MONTHS = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
 export function fmtMonth(ym: string) {
-  const [y, m] = ym.split("-").map(Number);
+  const [y = 1970, m = 1] = ym.split("-").map(Number);
   return `${MONTHS[m - 1]} de ${y}`;
 }
 

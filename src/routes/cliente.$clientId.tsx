@@ -17,15 +17,15 @@ import {
 import { endOr } from "@/lib/search";
 import { cn } from "@/lib/utils";
 
-type S = { end?: string; view?: "semana" | "mes"; month?: string; present?: boolean };
+type S = { end?: string | undefined; view?: "semana" | "mes" | undefined; month?: string | undefined; present?: boolean | undefined };
 
 export const Route = createFileRoute("/cliente/$clientId")({
-  validateSearch: (s: Record<string, unknown>): S => ({
+  validateSearch: (q: Record<string, unknown>): S => { const s = q as { end?: unknown; view?: unknown; month?: unknown; present?: unknown }; return {
     end: typeof s.end === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.end) ? s.end : undefined,
     view: s.view === "mes" ? "mes" : undefined,
     month: typeof s.month === "string" && /^\d{4}-\d{2}$/.test(s.month) ? s.month : undefined,
     present: s.present === true || s.present === "true" ? true : undefined,
-  }),
+  }; },
   head: () => ({
     meta: [
       { title: "Dashboard do cliente — ATA" },

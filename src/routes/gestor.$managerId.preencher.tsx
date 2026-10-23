@@ -58,14 +58,14 @@ function BulkFill() {
   const filled = clients.filter((c) => existing(c.id)).length;
 
   const saveAll = async () => {
-    const bad = dirty.filter((c) => { const L = parseBR(rows[c.id].leads); return L == null || !Number.isInteger(L) || parseBR(rows[c.id].cpl) == null; });
-    if (bad.length) return toast.error(`Confira os valores de: ${bad.map((c) => c.name).join(", ")}`);
+    const bad = dirty.filter((c) => { const r = rows[c.id]; const L = parseBR(r?.leads ?? ""); return L == null || !Number.isInteger(L) || parseBR(r?.cpl ?? "") == null; });
+    if (bad.length) return void toast.error(`Confira os valores de: ${bad.map((c) => c.name).join(", ")}`);
     setSaving(true);
     let ok = 0;
     for (const c of dirty) {
       try {
         const e = existing(c.id);
-        await save.mutateAsync({ id: e?.id, client_id: c.id, period_start: p.start, period_end: p.end, leads: parseBR(rows[c.id].leads)!, cpl: parseBR(rows[c.id].cpl)!, notes: e?.notes ?? null });
+        await save.mutateAsync({ id: e?.id, client_id: c.id, period_start: p.start, period_end: p.end, leads: parseBR(rows[c.id]?.leads ?? "")!, cpl: parseBR(rows[c.id]?.cpl ?? "")!, notes: e?.notes ?? null });
         ok++;
       } catch (err) { toast.error(`${c.name}: ${(err as Error).message}`); }
     }

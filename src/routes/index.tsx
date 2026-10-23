@@ -44,9 +44,9 @@ function Home() {
   const open = (m: Manager | null) => { setEditing(m); setName(m?.name ?? ""); };
   const submit = async () => {
     const n = name.trim();
-    if (!n) return toast.error("Informe o nome do gestor.");
+    if (!n) return void toast.error("Informe o nome do gestor.");
     if ((managers.data ?? []).some((m) => m.id !== editing?.id && m.name.toLowerCase() === n.toLowerCase()))
-      return toast.error("Já existe um gestor com esse nome.");
+      return void toast.error("Já existe um gestor com esse nome.");
     try {
       await save.mutateAsync({ id: editing?.id, name: n });
       toast.success(editing ? "Gestor atualizado." : "Gestor cadastrado.");
