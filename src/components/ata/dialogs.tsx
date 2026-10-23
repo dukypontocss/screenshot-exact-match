@@ -8,15 +8,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSaveClient, useSaveResult, type Client } from "@/lib/api";
 import { brl, daysInPeriod, findPeriod, int, parseBR, weekEndingOn, todayISO, type Result } from "@/lib/ata";
 
+export const DOTS = ["🔵", "🟠", "⚪", "🟢", "🔴", "🟡", "🟣", "🟤", "⚫"];
+
 export function ClientDialog({
   open, onOpenChange, managerId, client, existing,
 }: { open: boolean; onOpenChange: (o: boolean) => void; managerId: string; client?: Client | null; existing: Client[] }) {
   const save = useSaveClient();
   const [name, setName] = useState("");
   const [start, setStart] = useState("");
+  const [dot, setDot] = useState("🔵");
   const [notes, setNotes] = useState("");
   useEffect(() => {
-    if (open) { setName(client?.name ?? ""); setStart(client?.start_date ?? ""); setNotes(client?.notes ?? ""); }
+    if (open) { setDot(client?.dot ?? "🔵"); setName(client?.name ?? ""); setStart(client?.start_date ?? ""); setNotes(client?.notes ?? ""); }
   }, [open, client]);
 
   const submit = async () => {
@@ -25,7 +28,7 @@ export function ClientDialog({
     const dup = existing.find((c) => c.manager_id === managerId && c.id !== client?.id && c.name.trim().toLowerCase() === n.toLowerCase());
     if (dup) return void toast.error(`Já existe um cliente "${dup.name}" nesta carteira${dup.archived ? " (arquivado)" : ""}.`);
     try {
-      await save.mutateAsync({ id: client?.id, manager_id: managerId, name: n, start_date: start || null, notes: notes.trim() || null });
+      await save.mutateAsync({ id: client?.id, manager_id: managerId, name: n, start_date: start || null, notes: notes.trim() || null, dot });
       toast.success(client ? "Cliente atualizado." : "Cliente cadastrado.");
       onOpenChange(false);
     } catch (e) { toast.error((e as Error).message); }
@@ -37,6 +40,7 @@ export function ClientDialog({
         <DialogHeader><DialogTitle>{client ? "Editar cliente" : "Novo cliente"}</DialogTitle></DialogHeader>
         <div className="grid gap-4">
           <div className="grid gap-1.5"><Label htmlFor="cn">Nome do cliente</Label><Input id="cn" value={name} onChange={(e) => setName(e.target.value)} autoFocus /></div>
+          <div className="grid gap-1.5"><Label>Cor da bolinha</Label><div className="flex flex-wrap gap-1">{DOTS.map((d) => <button key={d} type="button" onClick={() => setDot(d)} aria-label={`Cor ${d}`} className={`grid h-9 w-9 place-items-center rounded-md border text-lg ${dot === d ? "border-primary ring-2 ring-ring" : "border-border"}`}>{d}</button>)}</div></div>
           <div className="grid gap-1.5"><Label htmlFor="cs">Início do acompanhamento (opcional)</Label><Input id="cs" type="date" value={start} onChange={(e) => setStart(e.target.value)} /></div>
           <div className="grid gap-1.5"><Label htmlFor="co">Observações (opcional)</Label><Textarea id="co" value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
         </div>
@@ -127,7 +131,7 @@ export function ResultDialog({
           </div>
           {L != null && C != null && (
             <div className="rounded-md bg-muted p-3 text-sm">
-              <div className="font-semibold">🔵 {client?.name}</div>
+              <div className="font-semibold">{client?.dot ?? "🔵"} {client?.name}</div>
               <div className="num">Lead: {int(L)}</div>
               <div className="num">CPL: {brl(C)}</div>
               <div className="mt-1 text-xs text-muted-foreground">Investimento estimado: <span className="num">{brl(L * C)}</span></div>
