@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ClienteClientIdRouteImport } from './routes/cliente.$clientId'
 import { Route as GestorManagerIdIndexRouteImport } from './routes/gestor.$managerId.index'
 import { Route as GestorManagerIdPreencherRouteImport } from './routes/gestor.$managerId.preencher'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClienteClientIdRoute = ClienteClientIdRouteImport.update({
+  id: '/cliente/$clientId',
+  path: '/cliente/$clientId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GestorManagerIdIndexRoute = GestorManagerIdIndexRouteImport.update({
@@ -32,30 +38,47 @@ const GestorManagerIdPreencherRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cliente/$clientId': typeof ClienteClientIdRoute
   '/gestor/$managerId/preencher': typeof GestorManagerIdPreencherRoute
   '/gestor/$managerId/': typeof GestorManagerIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cliente/$clientId': typeof ClienteClientIdRoute
   '/gestor/$managerId/preencher': typeof GestorManagerIdPreencherRoute
   '/gestor/$managerId': typeof GestorManagerIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cliente/$clientId': typeof ClienteClientIdRoute
   '/gestor/$managerId/preencher': typeof GestorManagerIdPreencherRoute
   '/gestor/$managerId/': typeof GestorManagerIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/gestor/$managerId/preencher' | '/gestor/$managerId/'
+  fullPaths:
+    | '/'
+    | '/cliente/$clientId'
+    | '/gestor/$managerId/preencher'
+    | '/gestor/$managerId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/gestor/$managerId/preencher' | '/gestor/$managerId'
-  id: '__root__' | '/' | '/gestor/$managerId/preencher' | '/gestor/$managerId/'
+  to:
+    | '/'
+    | '/cliente/$clientId'
+    | '/gestor/$managerId/preencher'
+    | '/gestor/$managerId'
+  id:
+    | '__root__'
+    | '/'
+    | '/cliente/$clientId'
+    | '/gestor/$managerId/preencher'
+    | '/gestor/$managerId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ClienteClientIdRoute: typeof ClienteClientIdRoute
   GestorManagerIdPreencherRoute: typeof GestorManagerIdPreencherRoute
   GestorManagerIdIndexRoute: typeof GestorManagerIdIndexRoute
 }
@@ -67,6 +90,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cliente/$clientId': {
+      id: '/cliente/$clientId'
+      path: '/cliente/$clientId'
+      fullPath: '/cliente/$clientId'
+      preLoaderRoute: typeof ClienteClientIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gestor/$managerId/': {
@@ -88,6 +118,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ClienteClientIdRoute: ClienteClientIdRoute,
   GestorManagerIdPreencherRoute: GestorManagerIdPreencherRoute,
   GestorManagerIdIndexRoute: GestorManagerIdIndexRoute,
 }
