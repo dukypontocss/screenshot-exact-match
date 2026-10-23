@@ -111,7 +111,7 @@ function ClientPage() {
       {view === "semana" ? <WeekNav end={end} onChange={(e) => go({ end: e, month: undefined })} /> : (
         <div className="flex items-center gap-1 rounded-md border border-border bg-card p-1">
           <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Mês anterior" onClick={() => go({ month: shiftMonth(month, -1) })}><ChevronLeft className="h-4 w-4" /></Button>
-          <span className="px-2 text-sm font-medium capitalize">{fmtMonth(month)}</span>
+          <span className="px-2 text-sm font-medium">{fmtMonth(month)}</span>
           <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Próximo mês" onClick={() => go({ month: shiftMonth(month, 1) })}><ChevronRight className="h-4 w-4" /></Button>
         </div>
       )}
@@ -143,7 +143,7 @@ function ClientPage() {
             {!present && manager && <Link to="/gestor/$managerId" params={{ managerId: manager.id }} search={{ end }} className="text-sm text-muted-foreground hover:text-foreground">← {manager.name}</Link>}
             <h1 className={cn("mt-1 font-bold tracking-tight", present ? "text-4xl sm:text-5xl" : "text-3xl")}>🔵 {client.name}</h1>
             <p className="mt-1 text-muted-foreground num">
-              {manager?.name} · {view === "semana" ? `${fmtDate(cur.start)} a ${fmtDate(cur.end, true)}` : <span className="capitalize">{fmtMonth(month)}</span>}
+              {manager?.name} · {view === "semana" ? `${fmtDate(cur.start)} a ${fmtDate(cur.end, true)}` : fmtMonth(month)}
             </p>
           </div>
           {!present && periodControls}
@@ -215,7 +215,7 @@ function ClientPage() {
                     {[...rows].reverse().map((r) => (
                       <tr key={r.id} className={cn("border-t border-border", r.id === a?.id && "bg-accent")}>
                         <td className="px-4 py-2 num"><button className="hover:underline" onClick={() => go({ end: r.period_end, view: undefined, month: undefined })}>{fmtDate(r.period_start)} – {fmtDate(r.period_end, true)}</button></td>
-                        <td className="px-4 py-2 capitalize text-muted-foreground">{fmtMonth(monthOfPeriod(r.period_start, r.period_end))}</td>
+                        <td className="px-4 py-2 text-muted-foreground">{fmtMonth(monthOfPeriod(r.period_start, r.period_end))}</td>
                         <td className="px-4 py-2 text-right num">{int(r.leads)}</td>
                         <td className="px-4 py-2 text-right num">{brl(r.cpl)}</td>
                         <td className="px-4 py-2 text-right num">{brl(investment(r))}</td>

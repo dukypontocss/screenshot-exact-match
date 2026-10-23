@@ -81,7 +81,7 @@ export function fmtDate(iso: string, withYear = false) {
 const MONTHS = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
 export function fmtMonth(ym: string) {
   const [y = 1970, m = 1] = ym.split("-").map(Number);
-  return `${MONTHS[m - 1]} de ${y}`;
+  const n = MONTHS[m - 1] ?? ""; return `${n.charAt(0).toUpperCase()}${n.slice(1)} de ${y}`;
 }
 
 export const investment = (r: Pick<Result, "leads" | "cpl">) => r.leads * r.cpl;
