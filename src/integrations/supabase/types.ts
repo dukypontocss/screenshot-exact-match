@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           archived: boolean
           created_at: string
+          dot: string
           id: string
           manager_id: string
           name: string
@@ -27,6 +28,7 @@ export type Database = {
         Insert: {
           archived?: boolean
           created_at?: string
+          dot?: string
           id?: string
           manager_id: string
           name: string
@@ -36,6 +38,7 @@ export type Database = {
         Update: {
           archived?: boolean
           created_at?: string
+          dot?: string
           id?: string
           manager_id?: string
           name?: string

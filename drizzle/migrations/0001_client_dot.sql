@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN dot text NOT NULL DEFAULT '🔵';
