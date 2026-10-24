@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: ata-backend
+    env: node
+    plan: free
+    buildCommand: npm run build:backend
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+  - type: web
+    name: ata-frontend
+    env: node
+    plan: free
+    buildCommand: npm run build:frontend
+    startCommand: npx serve -s dist -l $PORT
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: ata-backend
+          type: web
+          property: hostport
+          envVarKey: VITE_API_URL
