@@ -1,10 +1,9 @@
 {
   "name": "ata-server",
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "dev": "tsx watch src/app.ts",
-    "build": "tsc",
+    "buil  "type": "module",d": "tsc",
     "start": "node dist/app.js"
   },
   "dependencies": {
