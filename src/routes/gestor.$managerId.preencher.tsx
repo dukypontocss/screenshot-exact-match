@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAllClients, useManagers, useResultsFor, useSaveResult } from "@/lib/api";
-import { brl, fmtDate, parseBR, weekEndingOn } from "@/lib/ata";
-import { endOr, validatePeriod } from "@/lib/search";
+import { brl, fmtDate, parseBR } from "@/lib/ata";
+import { periodOr, validatePeriod } from "@/lib/search";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/gestor/$managerId/preencher")({
@@ -28,14 +28,14 @@ type Row = { leads: string; cpl: string };
 
 function BulkFill() {
   const { managerId } = Route.useParams();
-  const end = endOr(Route.useSearch().end);
+  const p = periodOr(Route.useSearch());
+  const { start, end } = p;
   const navigate = useNavigate({ from: Route.fullPath });
   const managers = useManagers();
   const all = useAllClients();
   const clients = useMemo(() => (all.data ?? []).filter((c) => c.manager_id === managerId && !c.archived), [all.data, managerId]);
   const results = useResultsFor(clients.map((c) => c.id));
   const save = useSaveResult();
-  const p = weekEndingOn(end);
   const existing = (cid: string) => results.data?.find((r) => r.client_id === cid && r.period_start === p.start && r.period_end === p.end);
 
   const [rows, setRows] = useState<Record<string, Row>>({});
@@ -48,7 +48,7 @@ function BulkFill() {
     }
     setRows(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [results.data, clients.length, end]);
+  }, [results.data, clients.length, start, end]);
 
   const dirty = clients.filter((c) => {
     const r = rows[c.id]; const e = existing(c.id);
@@ -81,13 +81,13 @@ function BulkFill() {
         <Button onClick={saveAll} disabled={!dirty.length || saving} size="sm"><Save className="h-4 w-4" /> {saving ? "Salvando…" : `Salvar ${dirty.length || ""} alteraç${dirty.length === 1 ? "ão" : "ões"}`}</Button>
       </AppHeader>
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-        <Link to="/gestor/$managerId" params={{ managerId }} search={{ end }} className="text-sm text-muted-foreground hover:text-foreground">← Painel de {manager?.name ?? "gestor"}</Link>
+        <Link to="/gestor/$managerId" params={{ managerId }} search={{ start, end }} className="text-sm text-muted-foreground hover:text-foreground">← Painel de {manager?.name ?? "gestor"}</Link>
         <div className="mt-1 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Preenchimento rápido</h1>
             <p className="text-sm text-muted-foreground num">{fmtDate(p.start)} a {fmtDate(p.end, true)} · {filled}/{clients.length} preenchidos</p>
           </div>
-          <WeekNav end={end} onChange={(e) => navigate({ search: { end: e } })} />
+          <WeekNav start={start} end={end} onChange={(np) => navigate({ search: np })} />
         </div>
         <p className="mt-3 text-sm text-muted-foreground">Use Tab para avançar entre os campos e Enter para salvar.</p>
 

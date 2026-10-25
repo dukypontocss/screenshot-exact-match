@@ -51,10 +51,10 @@ export function ClientDialog({
 }
 
 export function ResultDialog({
-  open, onOpenChange, client, results, defaultEnd, initial,
+  open, onOpenChange, client, results, defaultEnd, defaultStart, initial,
 }: {
   open: boolean; onOpenChange: (o: boolean) => void; client: Client | null; results: Result[];
-  defaultEnd: string; initial?: Result | null;
+  defaultEnd: string; defaultStart?: string | undefined; initial?: Result | null;
 }) {
   const save = useSaveResult();
   const [start, setStart] = useState("");
@@ -74,10 +74,10 @@ export function ResultDialog({
 
   useEffect(() => {
     if (!open) return;
-    const p = initial ? { start: initial.period_start, end: initial.period_end } : weekEndingOn(defaultEnd || todayISO());
+    const p = initial ? { start: initial.period_start, end: initial.period_end } : defaultStart && defaultEnd && defaultStart <= defaultEnd ? { start: defaultStart, end: defaultEnd } : weekEndingOn(defaultEnd || todayISO());
     setStart(p.start); setEnd(p.end); loadFor(p.start, p.end);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, client?.id, initial?.id, defaultEnd]);
+  }, [open, client?.id, initial?.id, defaultEnd, defaultStart]);
 
   const conflict = client && start && end ? findPeriod(results.filter((r) => r.client_id === client.id), start, end) : undefined;
   const isConflict = conflict && conflict.id !== editing?.id;
@@ -111,7 +111,7 @@ export function ResultDialog({
               <Input id="ps" type="date" value={start} onChange={(e) => { setStart(e.target.value); loadFor(e.target.value, end); }} /></div>
             <div className="grid gap-1.5"><Label htmlFor="pe">Fim</Label>
               <Input id="pe" type="date" value={end} onChange={(e) => {
-                const v = e.target.value; if (!v) return; const w = weekEndingOn(v); setEnd(v); setStart(w.start); loadFor(w.start, v);
+                const v = e.target.value; if (!v) return; setEnd(v); loadFor(start, v);
               }} /></div>
           </div>
           <p className="-mt-2 text-xs text-muted-foreground">

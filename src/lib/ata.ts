@@ -113,3 +113,30 @@ export function trendFromCpl(cur: number | null, prev: number | null): Trend {
 export function findPeriod<T extends Pick<Result, "period_start" | "period_end">>(rows: T[], start: string, end: string) {
   return rows.find((r) => r.period_start === start && r.period_end === end);
 }
+
+export type Period = { start: string; end: string };
+/** Same-length period immediately before `p`. */
+export function previousPeriod(p: Period): Period {
+  const n = daysInPeriod(p.start, p.end);
+  return { start: addDays(p.start, -n), end: addDays(p.start, -1) };
+}
+/**
+ * Results attributed to a freely chosen period: a result counts when most of its
+ * days fall inside the period (same "majority" idea as the month rule).
+ */
+export function rowsInPeriod<T extends Pick<Result, "period_start" | "period_end">>(rows: T[], p: Period): T[] {
+  return rows.filter((r) => {
+    const s = r.period_start > p.start ? r.period_start : p.start;
+    const e = r.period_end < p.end ? r.period_end : p.end;
+    if (e < s) return false;
+    return daysInPeriod(s, e) * 2 >= daysInPeriod(r.period_start, r.period_end);
+  });
+}
+export type Summary<T> = { leads: number; cpl: number; rows: T[] };
+/** Consolidated leads/CPL for a period; null when nothing was filled (absence is not zero). */
+export function periodSummary<T extends Result>(rows: T[], p: Period): Summary<T> | null {
+  const inside = rowsInPeriod(rows, p);
+  if (!inside.length) return null;
+  const t = consolidate(inside);
+  return { leads: t.leads, cpl: t.cpl ?? 0, rows: inside };
+}
