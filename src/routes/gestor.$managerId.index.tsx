@@ -152,7 +152,7 @@ function ManagerPage() {
         </div>
       </main>
       <ClientDialog open={clientDlg.open} onOpenChange={(o) => setClientDlg((s) => ({ ...s, open: o }))} managerId={managerId} client={clientDlg.client} existing={allClients.data ?? []} />
-      <ResultDialog open={resultDlg.open} onOpenChange={(o) => setResultDlg((s) => ({ ...s, open: o }))} client={resultDlg.client} results={rows} defaultEnd={end} />
+      <ResultDialog open={resultDlg.open} onOpenChange={(o) => setResultDlg((s) => ({ ...s, open: o }))} client={resultDlg.client} results={rows} defaultEnd={end} defaultStart={start} />
     </div>
   );
 }

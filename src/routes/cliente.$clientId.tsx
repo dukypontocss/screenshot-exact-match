@@ -237,7 +237,7 @@ function ClientPage() {
           </section>
         )}
       </main>
-      <ResultDialog open={dlg.open} onOpenChange={(o) => setDlg((s) => ({ ...s, open: o }))} client={client} results={rows} defaultEnd={end} initial={dlg.initial} />
+      <ResultDialog open={dlg.open} onOpenChange={(o) => setDlg((s) => ({ ...s, open: o }))} client={client} results={rows} defaultEnd={end} defaultStart={start} initial={dlg.initial} />
     </div>
   );
 }
