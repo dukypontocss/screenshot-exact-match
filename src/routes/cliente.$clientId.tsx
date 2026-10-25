@@ -157,7 +157,7 @@ function ClientPage() {
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 <Stat big={present} label="Lead" value={int(A.leads)} delta={<Delta pct={pctChange(A.leads, B?.leads)} goodWhen="up" />} />
                 <Stat big={present} label="CPL" value={brl(A.cpl)} delta={<Delta pct={pctChange(A.cpl, B?.cpl)} goodWhen="down" />} />
-                <Stat big={present} label="Investimento estimado" value={brl(investment(a))} hint={<span className="flex items-center gap-2">Leads × CPL <TrendBadge trend={trend} /></span>} />
+                <Stat big={present} label="Investimento estimado" value={brl(A.leads * A.cpl)} hint={<span className="flex items-center gap-2">Leads × CPL <TrendBadge trend={trend} /></span>} />
               </div>
             ) : (
               <div className="mt-6"><Empty title="Sem dados registrados para este período.">
