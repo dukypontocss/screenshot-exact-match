@@ -36,7 +36,7 @@ export const useResultsFor = (clientIds: string[]) =>
 export function useSaveManager() {
   const inv = useInvalidate();
   return useMutation({
-    mutationFn: async (m: { id?: string; name: string }) => {
+    mutationFn: async (m: { id?: string | undefined; name: string }) => {
       if (m.id) return api.managers.update(m.id, m.name);
       return api.managers.create(m.name);
     },
@@ -55,7 +55,7 @@ export function useArchiveManager() {
 export function useSaveClient() {
   const inv = useInvalidate();
   return useMutation({
-    mutationFn: async (c: CreateClientData & { id?: string }) => {
+    mutationFn: async (c: CreateClientData & { id?: string | undefined }) => {
       const { id, ...rest } = c;
       if (id) return api.clients.update(id, rest);
       return api.clients.create(rest);

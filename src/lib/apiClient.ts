@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const API_BASE = import.meta.env['VITE_API_URL'] || '/api';
 
 // O back (MongoDB) usa _id e camelCase; o front usa id e snake_case.
 // Estas funções traduzem nos dois sentidos.
@@ -102,6 +102,6 @@ export type CreateClientData = {
 };
 export type UpdateClientData = CreateClientData;
 export type SaveResultData = {
-  id?: string; client_id: string; period_start: string; period_end: string;
+  id?: string | undefined; client_id: string; period_start: string; period_end: string;
   leads: number; cpl: number; notes: string | null;
 };
