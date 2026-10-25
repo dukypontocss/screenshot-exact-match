@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { addDays, fmtDate, todayISO, type Trend } from "@/lib/ata";
+import { addDays, daysInPeriod, todayISO, type Trend } from "@/lib/ata";
 
 export function AppHeader({ children }: { children?: ReactNode }) {
   return (
@@ -64,30 +64,27 @@ export function TrendBadge({ trend }: { trend: Trend }) {
   return <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", t.cls)} title="Baseado na variação do CPL">{t.label}</span>;
 }
 
-export function WeekNav({ end, onChange }: { end: string; onChange: (end: string) => void }) {
-  const start = addDays(end, -6);
+export function WeekNav({ start, end, onChange }: { start: string; end: string; onChange: (p: { start: string; end: string }) => void }) {
   const today = todayISO();
+  const n = daysInPeriod(start, end);
+  const shift = (k: number) => onChange({ start: addDays(start, k * n), end: addDays(end, k * n) });
   return (
-    <div className="flex items-center gap-1 rounded-md border border-border bg-card p-1">
-      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onChange(addDays(end, -7))} aria-label="Semana anterior">
+    <div className="flex flex-wrap items-center gap-1 rounded-md border border-border bg-card p-1">
+      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => shift(-1)} aria-label="Período anterior">
         <ChevronLeft className="h-4 w-4" />
       </Button>
-      <label className="relative flex items-center gap-2 px-2 text-sm font-medium num">
-        <CalendarDays className="h-4 w-4 text-muted-foreground" />
-        {fmtDate(start)} – {fmtDate(end, true)}
-        <input
-          type="date"
-          aria-label="Escolher data final"
-          className="absolute inset-0 cursor-pointer opacity-0"
-          value={end}
-          onChange={(e) => e.target.value && onChange(e.target.value)}
-        />
-      </label>
-      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onChange(addDays(end, 7))} aria-label="Próxima semana">
+      <CalendarDays className="ml-1 h-4 w-4 text-muted-foreground" />
+      <input type="date" aria-label="Data inicial" className="num h-8 rounded border border-input bg-background px-2 text-sm" value={start} max={end}
+        onChange={(e) => e.target.value && onChange({ start: e.target.value, end: e.target.value > end ? e.target.value : end })} />
+      <span className="text-sm text-muted-foreground">a</span>
+      <input type="date" aria-label="Data final" className="num h-8 rounded border border-input bg-background px-2 text-sm" value={end} min={start}
+        onChange={(e) => e.target.value && onChange({ start: e.target.value < start ? e.target.value : start, end: e.target.value })} />
+      <span className="num px-1 text-xs text-muted-foreground">{n} dia{n === 1 ? "" : "s"}</span>
+      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => shift(1)} aria-label="Próximo período">
         <ChevronRight className="h-4 w-4" />
       </Button>
-      {end !== today && (
-        <Button size="sm" variant="ghost" className="h-8" onClick={() => onChange(today)}>Atual</Button>
+      {(end !== today || n !== 7) && (
+        <Button size="sm" variant="ghost" className="h-8" onClick={() => onChange({ start: addDays(today, -6), end: today })}>Últimos 7 dias</Button>
       )}
     </div>
   );

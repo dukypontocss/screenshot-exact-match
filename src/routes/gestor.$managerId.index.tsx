@@ -10,8 +10,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useAllClients, useManagers, useResultsFor, useSaveClient, type Client } from "@/lib/api";
-import { addDays, brl, consolidate, fmtDate, int, pctChange, trendFromCpl, weekEndingOn, type Result } from "@/lib/ata";
-import { endOr, validatePeriod } from "@/lib/search";
+import { brl, consolidate, daysInPeriod, fmtDate, int, pctChange, periodSummary, previousPeriod, trendFromCpl } from "@/lib/ata";
+import { periodOr, validatePeriod } from "@/lib/search";
 
 export const Route = createFileRoute("/gestor/$managerId/")({
   validateSearch: validatePeriod,
@@ -29,7 +29,8 @@ export const Route = createFileRoute("/gestor/$managerId/")({
 function ManagerPage() {
   const { managerId } = Route.useParams();
   const search = Route.useSearch();
-  const end = endOr(search.end);
+  const cur = periodOr(search);
+  const { start, end } = cur;
   const navigate = useNavigate({ from: Route.fullPath });
   const managers = useManagers();
   const allClients = useAllClients();
@@ -45,11 +46,10 @@ function ManagerPage() {
   const [clientDlg, setClientDlg] = useState<{ open: boolean; client: Client | null }>({ open: false, client: null });
   const [resultDlg, setResultDlg] = useState<{ open: boolean; client: Client | null }>({ open: false, client: null });
 
-  const cur = weekEndingOn(end);
-  const prev = weekEndingOn(addDays(end, -7));
+  const prev = previousPeriod(cur);
   const rows = results.data ?? [];
   const pick = (cid: string, p: { start: string; end: string }) =>
-    rows.find((r) => r.client_id === cid && r.period_start === p.start && r.period_end === p.end);
+    periodSummary(rows.filter((r) => r.client_id === cid), p);
 
   const active = mine.filter((c) => !c.archived);
   const enriched = (showArchived ? mine : active).map((c) => {
@@ -57,18 +57,18 @@ function ManagerPage() {
     const b = pick(c.id, prev);
     return { c, a, b, trend: trendFromCpl(a?.cpl ?? null, b?.cpl ?? null) };
   });
-  const curRows = active.map((c) => pick(c.id, cur)).filter(Boolean) as Result[];
-  const prevRows = active.map((c) => pick(c.id, prev)).filter(Boolean) as Result[];
+  const curRows = active.flatMap((c) => pick(c.id, cur)?.rows ?? []);
+  const prevRows = active.flatMap((c) => pick(c.id, prev)?.rows ?? []);
   const T = consolidate(curRows);
   const P = consolidate(prevRows);
-  const filledCount = curRows.length;
+  const filledCount = active.filter((c) => pick(c.id, cur)).length;
 
   const visible = enriched.filter(({ c, a, trend }) =>
     c.name.toLowerCase().includes(q.toLowerCase()) &&
     (fill === "todos" || (fill === "preenchido" ? !!a : !a)) &&
     (perf === "todos" || trend === perf));
 
-  const setEnd = (e: string) => navigate({ search: { end: e } });
+  const setPeriod = (p: { start: string; end: string }) => navigate({ search: p });
 
   if (managers.isLoading || allClients.isLoading) return <div className="min-h-screen"><AppHeader /><div className="mx-auto max-w-7xl p-6"><Skeleton className="h-40" /></div></div>;
   if (!manager) return <div className="min-h-screen"><AppHeader /><div className="mx-auto max-w-7xl p-6"><Empty title="Gestor não encontrado."><Link to="/" className="text-primary underline">Voltar ao início</Link></Empty></div></div>;
@@ -77,7 +77,7 @@ function ManagerPage() {
     <div className="min-h-screen">
       <AppHeader>
         <Button asChild variant="outline" size="sm">
-          <Link to="/gestor/$managerId/preencher" params={{ managerId }} search={{ end }}><TableProperties className="h-4 w-4" /> Preenchimento rápido</Link>
+          <Link to="/gestor/$managerId/preencher" params={{ managerId }} search={{ start, end }}><TableProperties className="h-4 w-4" /> Preenchimento rápido</Link>
         </Button>
         <Button size="sm" onClick={() => setClientDlg({ open: true, client: null })}><Plus className="h-4 w-4" /> Novo cliente</Button>
       </AppHeader>
@@ -86,9 +86,9 @@ function ManagerPage() {
           <div>
             <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">← Gestores</Link>
             <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">{manager.name}</h1>
-            <p className="text-sm text-muted-foreground num">Período {fmtDate(cur.start)} a {fmtDate(cur.end, true)} · 7 dias corridos</p>
+            <p className="text-sm text-muted-foreground num">Período {fmtDate(cur.start)} a {fmtDate(cur.end, true)} · {daysInPeriod(cur.start, cur.end)} dias corridos</p>
           </div>
-          <WeekNav end={end} onChange={setEnd} />
+          <WeekNav start={start} end={end} onChange={setPeriod} />
         </div>
 
         <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -137,7 +137,7 @@ function ManagerPage() {
                     </div>
                   ) : <p className="mt-3 text-sm text-muted-foreground">Sem dados para este período.</p>}
                   <div className="mt-4 flex flex-wrap gap-2">
-                    <Button asChild size="sm" variant="secondary"><Link to="/cliente/$clientId" params={{ clientId: c.id }} search={{ end }}><Eye className="h-4 w-4" /> Dashboard</Link></Button>
+                    <Button asChild size="sm" variant="secondary"><Link to="/cliente/$clientId" params={{ clientId: c.id }} search={{ start, end }}><Eye className="h-4 w-4" /> Dashboard</Link></Button>
                     <Button size="sm" variant={a ? "outline" : "default"} onClick={() => setResultDlg({ open: true, client: c })}><ClipboardList className="h-4 w-4" /> {a ? "Editar" : "Preencher"}</Button>
                     <Button size="icon" variant="ghost" className="ml-auto h-8 w-8" aria-label="Editar cliente" onClick={() => setClientDlg({ open: true, client: c })}><Pencil className="h-4 w-4" /></Button>
                     <Button size="icon" variant="ghost" className="h-8 w-8" aria-label={c.archived ? "Reativar" : "Arquivar"} onClick={async () => {
